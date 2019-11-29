@@ -1,0 +1,254 @@
+<style lang="less">
+page {
+  background-color: #efeff4;
+}
+.device {
+  &-head {
+    width: 750rpx;
+    background-color: #324db5;
+    padding: 16rpx 26rpx;
+    height: 104rpx;
+    box-sizing: border-box;
+
+    &-title {
+      width: 698rpx;
+      height: 72rpx;
+      background-color: #fff;
+      border-radius: 16rpx;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      &-left {
+        display: flex;
+        align-items: center;
+        .image {
+          width: 32rpx;
+          height: 32rpx;
+          margin-left: 16rpx;
+          margin-right: 16rpx;
+        }
+        &-input {
+          font-size: 34rpx;
+        }
+      }
+    }
+  }
+  &-content {
+    width: 750rpx;
+    padding: 0 26rpx;
+    background-color: #efeff4;
+    box-sizing: border-box;
+    &-item {
+      margin-top: 16rpx;
+      width: 698rpx;
+      background-color: #fff;
+      border-radius: 12rpx;
+      padding: 0 30rpx;
+      box-sizing: border-box;
+      .title {
+        font-size: 26rpx;
+        color: #313131;
+        height: 60rpx;
+        align-items: center;
+        display: flex;
+        justify-content: flex-start;
+        border-bottom: 1rpx solid #e5e5ea;
+        .id {
+          margin-right: 20rpx;
+        }
+        .status {
+          width: 80rpx;
+          height: 30rpx;
+          box-sizing: border-box;
+          font-size: 20rpx;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .status.green {
+          border: 2rpx solid #4cd964;
+          color: #4cd964;
+             background-color: #dbf7e0;
+        }
+           .status.blue {
+          border: 2rpx solid blue;
+          color: blue;
+             background-color: skyblue;
+        }
+           .status.red {
+          border: 2rpx solid red;
+          color: red;
+             background-color: pink;
+        }
+      }
+      .content {
+        display: flex;
+        justify-content: space-between;
+        padding: 30rpx 0;
+        display: flex;
+        align-items: flex-end;
+        .right {
+          width: 120rpx;
+          height: 50rpx;
+          border: 1rpx solid #e5e5ea;
+          font-size: 20rpx;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: #a0a0a0;
+          border-radius: 12rpx;
+          .rightImage {
+            margin-right: 10rpx;
+            width: 20rpx;
+            height: 26rpx;
+          }
+        }
+        .left {
+          color: #313131;
+          .bussiness {
+            font-size: 30rpx;
+            font-weight: bold;
+          }
+          .power {
+            margin-top: 10rpx;
+            font-size: 24rpx;
+          }
+          .power.red{
+            color:red;
+          }
+        }
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="device">
+    <view class="device-head">
+      <view class="device-head-title">
+        <view class="device-head-title-left">
+          <image src="../../assets/Search.png" class="image"></image>
+          <input class="device-head-title-left-input" type="text" placeholder="请输入车牌号" value="{{searchVal}}" bindinput="searchInput"></input>
+        </view>
+      </view>
+    </view>
+    <view class="device-content">
+      <view class="device-content-item" wx:for="{{NewItems}}" wx:key="index" wx:if="{{item.buggyNumber}}">
+        <view class="title">
+          <view class="id">车牌号:{{item.buggyNumber}}</view>
+          <view class="status blue" wx:if="{{item.status===1}}">使用中</view>
+          <view class="status green" wx:if="{{item.status===2}}">空闲</view>
+          <view class="status red" wx:if="{{item.status===3}}">故障</view>
+          <view class="status red" wx:if="{{item.status===4}}">离线</view>
+          <view class="status" wx:if="{{item.status===99}}">已删除</view>
+        </view>
+        <view class="content">
+          <view class="left">
+            <view class="bussiness">设备名称：{{item.buggyName}}</view>
+            <view class="power {{item.residueElectric<40?'red':''}}" >剩余电量：{{item.residueElectric?item.residueElectric:'0'}}% <text wx:if="{{item.residueElectric<40?'red':''}}">(低电量)</text></view>
+          </view>
+          <view class="right" @tap.stop="toPlace({{item.txlon}},{{item.txlat}},{{item.addr}},{{item.agentName}})">
+            <image src="../../assets/location_fill.png" class="rightImage"></image>
+            <text>查看位置</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '../../api/api'
+import {refresh} from '../../utils/refreshToken'
+export default class Device extends wepy.page {
+  config = {
+    navigationBarTitleText: '小赛手运营商'
+  };
+  data = {
+    buggyName: '',
+    deviceArr: [],
+    timer: null,
+    inputAgentialId: '',
+    // 取出所有的车牌号组成的数组
+    searchVal: '',
+    NewItems: [],
+    agentId: ''
+  };
+  watch = {
+    searchVal(newVal) {
+      // 过滤器的作用就是，当返回是真就将那一项塞进数组里面，如果是假就跳过
+      this.NewItems = this.deviceArr.filter(item => {
+        return item.buggyNumber.indexOf(newVal) !== -1
+      })
+    }
+  };
+  methods = {
+    toPlace(txlon, txlat, addr, agentName) {
+      console.log('经度1', txlon)
+      console.log('经度2', txlat)
+      wepy.navigateTo({
+        url: `place?txlon=${txlon}&txlat=${txlat}&addr=${addr}&agentName=${agentName}`
+      })
+    },
+    // 搜索框输入事情
+    searchInput(e) {
+      this.searchVal = e.detail.value
+      console.log(this.searchVal)
+      this.$apply()
+    }
+  };
+  // 获取设备信息
+  getInfo(agentId) {
+    let _this = this
+    var principalId=wepy.getStorageSync('principalId')
+    
+    let params = {
+      agentId: agentId,
+      filter: {},
+      operatorId:principalId
+    }
+    api.getDeviceInfo(params).then(res => {
+      console.log('设备信息111111111111', res)
+      if (res.code === '200') {
+        this.deviceArr = res.resultData.data
+        this.NewItems = res.resultData.data
+        console.log('第一次的数组', this.NewItems)
+        this.$apply()
+      } else if (res.code === '401') {
+        console.log('401嘛', res)
+        refresh().then(res => {
+          if (res === '1') {
+            _this.getInfo()
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: res.msg, // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 2000, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+      }
+      this.$apply()
+    })
+  }
+  // 每隔1秒发送一次请求
+  testRquest(inputAgentialId) {
+    console.log('执行一次11')
+    setTimeout(() => {
+      this.getInfo(inputAgentialId)
+      this.$apply()
+    }, 2000)
+  }
+  onShow() {
+    // 显示所有的设备号
+    this.getInfo(this.agentId)
+  }
+  onLoad() {
+    this.principalId = wepy.getStorageSync('principalId')
+    this.agentId = wepy.getStorageSync('agentialId')
+    console.log('onLoad')
+  }
+}
+</script>

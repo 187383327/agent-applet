@@ -1,0 +1,636 @@
+<style lang="less" >
+page {
+  background-color: #ffff;
+  font-size: 28rpx;
+}
+.feedback {
+  width: 750rpx;
+  box-sizing: border-box;
+  padding: 0 26rpx;
+  &-sao {
+    margin: 60rpx 0;
+    box-sizing: border-box;
+    width: 698rpx;
+    height: 100rpx;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    &-input {
+      width: 698rpx;
+      height: 100rpx;
+      border: 1rpx solid #e5e5ea;
+      border-radius: 12rpx;
+      padding: 0 30rpx;
+      box-sizing: border-box;
+    }
+    .ul {
+      position: absolute;
+      top: 100rpx;
+      width: 638rpx;
+      left: 0;
+     border-radius: 12rpx;
+      padding: 0 30rpx;
+       border: 1rpx solid #e5e5ea;
+      background-color: #fff;
+      z-index: 9999;
+      color: #324db5;
+      font-size: 28rpx;
+      box-sizing: content-box;
+      .li {
+        width: 638rpx;
+        height: 60rpx;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+  &-detail {
+    color: #8e8e93;
+    margin-bottom: 20rpx;
+    &-title {
+      color: #a0a0a0;
+      font-size: 26rpx;
+    }
+    &-content {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      &-item {
+        width: 220rpx;
+        height: 80rpx;
+        color: #313131;
+        box-sizing: border-box;
+        border: 1rpx solid #efeff4;
+        background-color: #fff;
+        border-radius: 16rpx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20rpx;
+        &.blur {
+          color: #324db5;
+          border: 1rpx solid #324db5;
+          background-color: #e4e9ff;
+        }
+      }
+    }
+  }
+
+  &-guzhang {
+    background-color: #fff;
+    margin-bottom: 60rpx;
+    border-radius: 16rpx;
+    overflow: hidden;
+    .textarea {
+      border-radius: 16rpx;
+      padding-top: 30rpx;
+      padding-left: 30rpx;
+      box-sizing: border-box;
+      width: 698rpx;
+      height: 180rpx;
+      background-color: #fff;
+      font-size: 28rpx;
+      border: 1rpx solid #efeff4;
+    }
+  }
+
+  &-photo {
+    margin-bottom: 60rpx;
+
+    &-content {
+      display: flex;
+      justify-content: flex-start;
+      &-show {
+        margin-left: 43rpx;
+        position: relative;
+        width: 116rpx;
+        height: 116rpx;
+        .upload-img {
+          width: 116rpx;
+          height: 116rpx;
+        }
+        .close-right {
+          top: -18rpx;
+          right: -18rpx;
+          width: 36rpx;
+          height: 36rpx;
+          position: absolute;
+          image {
+            width: 36rpx;
+            height: 36rpx;
+          }
+        }
+      }
+      &-upload {
+        width: 116rpx;
+        height: 116rpx;
+        box-sizing: border-box;
+        border: 1rpx dashed #8e8e93;
+        background-color: #f9f9fe;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        position: relative;
+        .uploadImage {
+          width: 56rpx;
+          height: 56rpx;
+        }
+        .uplodImg2 {
+          width: 118rpx;
+          height: 118rpx;
+          position: absolute;
+          top: -1rpx;
+          left: -1rpx;
+        }
+      }
+    }
+    &-title {
+      color: #8e8e93;
+      font-size: 26rpx;
+      margin-bottom: 20rpx;
+      .t1 {
+        font-size: 20rpx;
+      }
+    }
+  }
+  &-submit {
+    width: 698rpx;
+    height: 88rpx;
+    font-size: 36rpx;
+    background-color: #324db5;
+    border-radius: 10rpx;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+  }
+  .feedback-submit.stop {
+    pointer-events: none;
+  }
+}
+</style>
+<template>
+  <view class="feedback">
+    <!-- 必扫 -->
+    <view class="feedback-sao">
+      <view class="feedback-sao">
+        <input class="feedback-sao-input" type="text" placeholder="请输入车牌号" value="{{searchVal}}" bindinput="searchInput"></input>
+        <!-- 显示设备 -->
+        <view class="ul" wx:if="{{showModel}}">
+          <view wx:for="{{NewItems}}" wx:key="index" wx:if="{{item.buggyNumber}}" class="li" @tap.stop="slected({{item.buggyNumber}})">{{item.buggyNumber}}</view>
+        </view>
+      </view>
+    </view>
+    <!-- 必选 -->
+    <view class="feedback-detail">
+      <view class="feedback-detail-title">故障类型</view>
+      <view class="feedback-detail-content">
+        <view class="feedback-detail-content-item {{item.blur?'blur':''}}" wx:for="{{items}}" wx:key="{{index}}" @tap.stop="itemClick({{item.type}},{{item.blur}})">{{item.content}}</view>
+      </view>
+    </view>
+    <!-- 必填 -->
+    <view class="feedback-guzhang">
+      <textarea value="{{content}}" name="" id="" cols="30" rows="10" placeholder="输入故障问题内容" class="textarea" bindinput="contentBlur"></textarea>
+    </view>
+    <!-- 选填 -->
+    <view class="feedback-photo">
+      <view class="feedback-photo-title">
+        <text>上传照片 </text>
+        <text class="t1">(可添加3张)</text>
+      </view>
+      <view class="feedback-photo-content">
+        <view class="feedback-photo-content-upload" wx:if="{{imgs.length<3}}" @tap.stop="upLoadImg">
+          <image src="../../assets/add.png" class="uploadImage" ></image>
+          <image src="{{img}}" wx:if="{{img}}" class="uplodImg2"></image>
+        </view>
+        <view class="feedback-photo-content-show" wx:for="{{imgs}}" wx:for-index="idx">
+          <view class="tempFilePaths" @tap.stop="showBigImg({{item}},{{imgs}})">
+            <image src="{{item}}" class="upload-img"></image>
+            <view class="close-right" @tap.stop="closeUplod({{idx}})">
+              <image src="../../assets/close.png"></image>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <button class=" feedback-submit {{stopClick?'stop':''}}" @tap.stop="feedBack">提交</button>
+    <!-- </form> -->
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '../../api/api'
+import {refresh} from '../../utils/refreshToken'
+export default class Feedback extends wepy.page {
+  config = {
+    navigationBarTitleText: '小赛手运营商'
+  };
+  data = {
+    items: [
+      { type: 1, content: '设备损坏', blur: false },
+      { type: 2, content: '无法启动', blur: false },
+      { type: 3, content: '支付退款', blur: false },
+      { type: 4, content: '电池损坏', blur: false },
+      { type: 5, content: '二维码', blur: false },
+      { type: 6, content: '其他', blur: false }
+    ],
+    selectedIndex: [],
+    // 上传图片的路径
+    img: '',
+    imgData: {
+      accept: 'image/gif, image/jpeg, image/png, image/jpg'
+    },
+    tempFilePaths: [],
+    // 图片临时路径
+    feedbackType: null,
+    // 故障类型
+    type: 0,
+    // 设备id
+    deviceNo: '',
+    // 失焦时的手机号
+    phones: null,
+    // 是否阻止点击行为
+    stopClick: false,
+    // 商家id
+    principalId: '',
+    imei: '865533039606618',
+    // 故障类型
+    typeContent: '',
+    content: '',
+    file1: '',
+    file2: '',
+    file3: '',
+    // 设备的imei号的数组
+    imeis: ['333', '6666666666', '555555'],
+    imeiValue: '',
+    // 设备信息的数组
+    deviceArr: [],
+    showModel: false,
+    searchVal: '',
+    NewItems: [],
+    imgs: [],
+    // 相对路径
+    picturePath: [],
+    agentId: ''
+  };
+  watch = {
+    searchVal(newVal) {
+      // 过滤器的作用就是，当返回是真就将那一项塞进数组里面，如果是假就跳过
+      this.NewItems = this.deviceArr.filter(item => {
+        return item.buggyNumber.indexOf(newVal) !== -1
+      })
+    }
+  };
+  methods = {
+    contentBlur(e) {
+      console.log(e)
+      this.content = e.detail.value
+    },
+    bindPickerChange(e) {
+      let val = parseInt(e.detail.value)
+      this.imeiValue = this.imeis[val]
+      console.log('选择器', e)
+    },
+    checkboxChange: function(e) {
+      console.log('checkbox发生change事件，携带value值为：', e.detail.value)
+    },
+    // 选择故障类型
+    itemClick(type, blur) {
+      this.items.forEach(element => {
+        if (element.type === type) {
+          element.blur = !element.blur
+          this.$apply()
+        }
+      })
+      console.log('数组', this.items)
+      blur = !blur
+    },
+    // 搜索框输入事情
+    searchInput(e) {
+      this.showModel = true
+      this.searchVal = e.detail.value
+      if (!this.searchVal) {
+        this.showModel = false
+      }
+      console.log(this.searchVal)
+      this.$apply()
+    },
+    // 编号框点击
+    slected(value) {
+      this.searchVal = value
+      this.showModel = false
+      this.$apply()
+    },
+    // 上传图片
+    upLoadImg() {
+      if (this.tempFilePaths.length > 2) {
+        wepy.showToast({
+          title: '超出上传图片数量', // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 1500, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+        // Tips.alert('超出上传图片数量')
+        return false
+      }
+      if (this.imgs.length === 0) {
+        wepy
+        .chooseImage({
+          count: 3,
+          sizeType: ['original', 'compressed'],
+          sourceType: ['album', 'camera']
+        })
+        .then(res => {
+          // 循环调用上传图片的功能
+          for (let i = 0; i < res.tempFilePaths.length; i++) {
+            let path = res.tempFilePaths[i]
+            wepy.getFileInfo({
+              filePath: res.tempFilePaths[i]
+            }).then(res => {
+              console.log('图片大小1111', res.size)
+              if (res.size < 1024 * 1024 * 5) {
+                this.uploadPhote(path, i)
+              } else {
+                wepy.showToast({
+                  title: '图片大小不能超过5M', // 提示的内容,
+                  icon: 'none', // 图标,
+                  duration: 1000, // 延迟时间,
+                  mask: true // 显示透明蒙层，防止触摸穿透,
+                })
+              }
+            })
+          }
+          this.$apply()
+        })
+      } else if (this.imgs.length === 1) {
+        wepy
+        .chooseImage({
+          count: 2,
+          sizeType: ['original', 'compressed'],
+          sourceType: ['album', 'camera']
+        })
+        .then(res => {
+          // 循环调用上传图片的功能
+          for (let i = 0; i < res.tempFilePaths.length; i++) {
+            let path = res.tempFilePaths[i]
+            wepy.getFileInfo({
+              filePath: res.tempFilePaths[i]
+            }).then(res => {
+              if (res.size < 1024 * 1024 * 5) {
+                this.uploadPhote(path, i)
+              } else {
+                wepy.showToast({
+                  title: '图片大小不能超过5M', // 提示的内容,
+                  icon: 'none', // 图标,
+                  duration: 1000, // 延迟时间,
+                  mask: true // 显示透明蒙层，防止触摸穿透,
+                })
+              }
+            })
+          }
+          this.$apply()
+        })
+      } else if (this.imgs.length === 2) {
+        wepy
+        .chooseImage({
+          count: 1,
+          sizeType: ['original', 'compressed'],
+          sourceType: ['album', 'camera']
+        })
+        .then(res => {
+          // 循环调用上传图片的功能
+          for (let i = 0; i < res.tempFilePaths.length; i++) {
+            let path = res.tempFilePaths[i]
+            wepy.getFileInfo({
+              filePath: res.tempFilePaths[i]
+            }).then(res => {
+              if (res.size < 1024 * 1024 * 5) {
+                this.uploadPhote(path, i)
+              } else {
+                wepy.showToast({
+                  title: '图片大小不能超过5M', // 提示的内容,
+                  icon: 'none', // 图标,
+                  duration: 1000, // 延迟时间,
+                  mask: true // 显示透明蒙层，防止触摸穿透,
+                })
+              }
+            })
+          }
+          this.$apply()
+        })
+      }
+    },
+    // 删除图片
+    closeUplod(index) {
+      //
+      let findex = index
+      let _this = this
+      let params = {
+        filePath: this.imgs[index],
+        header: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      }
+      api.deletePhoto(params).then(res => {
+        if (res.code === '200') {
+          this.imgs.splice(index, 1)
+          this.$apply()
+        } else if (res.code === '401') {
+          refresh().then(res => {
+            if (res === '1') {
+              _this.closeUplod(findex)
+            }
+          })
+        }
+      })
+      this.$apply()
+    },
+    // 预览
+    showBigImg(pic, imgs) {
+      wepy.previewImage({
+        current: pic, // 当前显示图片的http链接
+        urls: imgs // 需要预览的图片http链接列表
+      })
+    },
+    // 提交反馈
+    feedBack() {
+      console.log('相片数组', this.imgs)
+      this.stopClick = true
+      var _this = this
+      let typeArr = []
+      this.items.forEach(element => {
+        if (element.blur) {
+          typeArr.push(element.type)
+        }
+      })
+      let types = typeArr.join(',')
+      console.log('选中的数组', typeArr.join(','))
+      if (!this.searchVal) {
+        wepy.showToast({
+          title: '请输入车牌号', // 提示的内容,
+          icon: 'none',
+          duration: 2000 // 延迟时间,
+        })
+        _this.stopClick = false
+        return false
+      } else if (typeArr.length === 0) {
+        wepy.showToast({
+          title: '请选择故障类型', // 提示的内容,
+          icon: 'none',
+          duration: 2000 // 延迟时间,
+        })
+        _this.stopClick = false
+        return false
+      } else {
+        if (this.imgs && this.imgs.length === 1) {
+          this.file1 = this.imgs[0]
+        } else if (this.imgs && this.imgs.length === 2) {
+          this.file1 = this.imgs[0]
+          this.file2 = this.imgs[1]
+        } else if (this.imgs && this.imgs.length === 3) {
+          this.file1 = this.imgs[0]
+          this.file2 = this.imgs[1]
+          this.file3 = this.imgs[2]
+        }
+        var formData = {
+          agentId: wepy.getStorageSync('agentialId'),
+          buggyNumber: this.searchVal,
+          type: types,
+          content: this.content,
+          file1: this.file1,
+          file2: this.file2,
+          file3: this.file3,
+          header: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        }
+        this.toFeedback(formData)
+      }
+    }
+  };
+  // 封装反馈的接口
+  toFeedback(formData) {
+    let _this = this
+    let fformData = formData
+    api.feedback(formData).then(res => {
+      console.log('反馈', res)
+      if (res.code === '200') {
+        wepy.showToast({
+          title: '反馈成功', // 提示的内容,
+          icon: 'success', // 图标,
+          duration: 1500, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+        setTimeout(() => {
+          wepy.switchTab({ url: 'index' })
+        }, 1500)
+      } else if (res.code === '401') {
+        refresh().then(res => {
+          if (res === '1') {
+            _this.toFeedback(fformData)
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: res.msg, // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 1500, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+        setTimeout(() => {
+          wepy.switchTab({ url: 'index' })
+        }, 1500)
+      }
+      this.$apply()
+          // 解开
+      setTimeout(() => {
+        _this.stopClick = false
+      }, 1500)
+    })
+  }
+  // 封装上传图片的方法
+  uploadPhote(tempFile, i) {
+    console.log('第几个张', i)
+    if (this.imgs.length === 3) {
+      this.imgs = []
+    } else if (this.imgs.length === 1) {
+      i = 1
+    } else if (this.imgs.length === 2) {
+      i = 2
+    } else if (this.imgs.length === 0) {
+      i = 0
+    }
+    let tempFiles = tempFile
+    var _this = this
+    let token = wepy.getStorageSync('token')
+
+    // 调用微信的上传图片功能
+    wepy
+      .uploadFile({
+        url: `https://buggy.mzjmedia.net/AGENT/agent/upload-file-wx?accessToken=${token}`,
+        filePath: tempFiles,
+        name: 'file',
+        header: { 'content-type': 'multipart/form-data' }
+        // header: {'Content-type': 'application/x-www-form-urlencoded'}
+      })
+      .then(res => {
+        _this.img = ''
+        console.log(7777777)
+        console.log('上传图片1111111', res)
+        if (res.statusCode === 200) {
+          let resData = JSON.parse(res.data)
+          console.log('添加的图片', resData.resultData)
+          if (resData.code === '200') {
+            if (_this.imgs.length === 3) {
+              _this.imgs = []
+            } else {
+              _this.imgs.push(resData.resultData)
+              _this.picturePath.push(resData.resultData)
+            }
+            this.$apply()
+          }
+        }
+      })
+  }
+  // 获取所有的车牌号码
+  // 获取设备信息
+  getInfo() {
+    let _this = this
+    let params = {
+      agentId: this.agentId,
+      filter: {}
+    }
+    api.getDeviceInfo(params).then(res => {
+      console.log('设备信息', res)
+      if (res.code === '200') {
+        this.deviceArr = res.resultData.data
+        this.$apply()
+      } else if (res.code === '401') {
+        console.log('401嘛', res)
+        refresh().then(res => {
+          if (res === '1') {
+            _this.getInfo()
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: res.msg, // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 2000, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+      }
+      this.$apply()
+    })
+  }
+  onLoad() {
+    console.log('onLoad')
+    this.operatorId = wepy.getStorageSync('principalId')
+    this.agentId = wepy.getStorageSync('agentialId')
+  }
+  onShow() {
+    this.getInfo()
+  }
+}
+</script>

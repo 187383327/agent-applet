@@ -1,0 +1,589 @@
+<style lang="less">
+page {
+  background-color: #efeff4;
+}
+.home {
+  .blur {
+    color: #324db5;
+  }
+  padding: 0 26rpx;
+  width: 750rpx;
+  box-sizing: border-box;
+  &-header {
+    width: 698rpx;
+    height: 180rpx;
+    position: relative;
+    border-radius: 12rpx;
+    margin-top: 16rpx;
+    display: flex;
+    justify-content: start;
+    .image {
+      position: absolute;
+      top: 30rpx;
+      left: 30rpx;
+      width: 120rpx;
+      height: 120rpx;
+      border-radius: 50%;
+      margin-right: 30rpx;
+      z-index: 999;
+      image {
+        width: 120rpx;
+        height: 120rpx;
+        border-radius: 50%;
+      }
+    }
+    .bgImg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      border-radius: 12rpx;
+      width: 698rpx;
+      height: 180rpx;
+    }
+    .name {
+      position: absolute;
+      top: 30rpx;
+      left: 180rpx;
+      height: 120rpx;
+      display: flex;
+      flex-direction: column;
+      z-index: 999;
+      justify-content: center;
+      .top {
+        font-size: 36rpx;
+        color: #fff;
+        margin-bottom: 10rpx;
+      }
+    }
+  }
+  &-money {
+    margin: 16rpx 0;
+    height: 100rpx;
+    width: 698rpx;
+    background-color: #fff;
+    border-radius: 12rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30rpx;
+    box-sizing: border-box;
+    font-size: 30rpx;
+    .right {
+      width: 120rpx;
+      height: 60rpx;
+      border-radius: 12rpx;
+      background-color: #324db5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 26rpx;
+      color: #fff;
+    }
+  }
+  &-device,
+  &-statistis {
+    border-radius: 12rpx;
+    width: 698rpx;
+    margin-bottom: 16rpx;
+  }
+  &-device-content-item,
+  &-device-title,
+  &-statistis-item {
+    height: 26rpx;
+    width: 638rpx;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30rpx;
+    font-size: 26rpx;
+    padding-top: 30rpx;
+  }
+  &-device-title {
+    padding-top: 0;
+    height: 88rpx;
+  }
+  .thead {
+    width: 638rpx;
+    height: 88rpx;
+    box-sizing: border-box;
+    line-height: 88rpx;
+    border-bottom: 1rpx solid #e5e5ea;
+  }
+  .paddBot {
+    padding-bottom: 30rpx;
+  }
+  .message {
+    border-bottom: 1rpx solid #e5e5ea;
+  }
+  &-msg {
+    width: 698rpx;
+    padding: 0 30rpx;
+    box-sizing: border-box;
+    background-color: #fff;
+  }
+  &-msg-item {
+    padding: 31rpx 0;
+    height: 38rpx;
+    line-height: 38rpx;
+    width: 638rpx;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 30rpx;
+    .right {
+      display: flex;
+      justify-content: flex-end;
+      line-height: 39rpx;
+      height: 38rpx;
+      .num {
+        font-size: 26rpx;
+        width: 36rpx;
+        height: 36rpx;
+        border-radius: 50%;
+        background-color: #324db5;
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    .msgImage {
+      width: 40rpx;
+      height: 38rpx;
+      margin-right: 20rpx;
+    }
+    .pathImage {
+      width: 44rpx;
+      height: 72rpx;
+      margin-left: 20rpx;
+      margin-top: -15rpx;
+    }
+  }
+}
+</style>
+<template>
+  <view class="home">
+    <view class="home-header">
+      <view class="image" @tap.stop="upLoadImg">
+        <image src="{{headImg?headImg:'../../assets/my.png'}}"></image>
+      </view>
+      <view class="name">
+        <view class="top">{{principal}}</view>
+      </view>
+      <image src="../../assets/yuanju.png" class="bgImg"></image>
+    </view>
+    <!-- 钱包 -->
+    <view class="home-money">
+      <!-- ?? -->
+      <view class="left">我的钱包
+        <text class="blur">￥{{canWithdrawCash?canWithdrawCash:'0.00'}}</text>
+      </view>
+      <view class="right" @tap.stop="toDeposit">提现</view>
+    </view>
+    <!-- 设备 -->
+    <view class="home-device">
+      <view class="home-device-title">
+        <view class="thead">
+          <text>合计设备</text>
+          <text class="blur">{{total}}台 </text>
+        </view>
+      </view>
+      <view class="home-device-content">
+        <view class="home-device-content-item">
+          <view class="left">
+            已投放设备
+            <text class="blur">{{putTotal}}台</text>
+          </view>
+          <view class="right">
+            故障设备
+            <text class="blur">{{faultTotal}}台</text>
+          </view>
+        </view>
+        <view class="home-device-content-item">
+          <view class="left">
+            设备低电量
+            <text class="blur">{{lowBatteryTotal}}台</text>
+          </view>
+          <view class="right">
+            离线设备
+            <text class="blur">{{offLineTotal}}台</text>
+          </view>
+        </view>
+        <view class="home-device-content-item paddBot">
+          <view class="left">
+            使用中设备
+            <text class="blur">{{useTotal}}台</text>
+          </view>
+          <view class="right">
+            空闲设备
+            <text class="blur">{{freeTotal}}台</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 统计 -->
+    <view class="home-statistis">
+      <view class="home-statistis-item">
+        <view class="left">
+          今日已收租金
+          <text class="blur">{{todayBuggyIncome}}元</text>
+        </view>
+        <view class="right">
+          累计已收租金
+          <text class="blur">{{accumulativeBuggyIncome}}元</text>
+        </view>
+      </view>
+      <view class="home-statistis-item">
+        <view class="left">
+          今日租金支付次数
+          <text class="blur">{{todayPayCount}}次</text>
+        </view>
+        <view class="right">
+          累计租金支付次数
+          <text class="blur">{{accumulativePayCount}}次</text>
+        </view>
+      </view>
+      <view class="home-statistis-item paddBot">
+        <view class="left">
+          今日驾驶次数
+          <text class="blur">{{todayDriveCount}}次</text>
+        </view>
+        <view class="right">
+          累计驾驶次数
+          <text class="blur">{{accumulativeDriveCount}}次</text>
+        </view>
+      </view>
+    </view>
+    <!-- 消息，故障 -->
+    <view class="home-msg">
+      <view class="home-msg-item message" @tap.stop="toManage">
+        <view class="left">
+          <image src="../../assets/msga.png" class="msgImage"> </image>
+          <text>消息管理</text>
+        </view>
+        <view class="right">
+          <view class="num">{{totalSysMsgNumber}}</view>
+          <view>
+            <image src="../../assets/Path.png" class="pathImage"></image>
+          </view>
+        </view>
+      </view>
+      <view class="home-msg-item" @tap.stop="toFeedback">
+        <view class="left">
+          <image src="../../assets/fankui.png" class="msgImage"> </image>
+          <text>故障反馈</text>
+        </view>
+        <view class="right">
+          <image src="../../assets/Path.png" class="pathImage"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+import api from '../../api/api'
+import wxRequset from '../../utils/wxRequest'
+import {refresh} from '../../utils/refreshToken'
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '小赛手运营商'
+  };
+  data = {
+    // 离线设备总数
+    offLineTotal: 0,
+    // 全部设备
+    total: 0,
+    // 故障设备总数
+    faultTotal: 0,
+    // 空闲设备总数
+    freeTotal: 0,
+    // 低电量设备总数
+    lowBatteryTotal: 0,
+    // 投放设备总数
+    putTotal: 0,
+    // 使用中设备总数
+    useTotal: 0,
+    // 未读系统信息总数
+    totalSysMsgNumber: 0,
+    principalId: '',
+    // 代理商名字
+    principal: '',
+    headImg: '',
+    // 今日童车收入
+    todayBuggyIncome: 0,
+    // 累计童车收入
+    accumulativeBuggyIncome: 0,
+    // 今日支付次数
+    todayPayCount: 0,
+    // 累计支付次数
+    accumulativePayCount: 0,
+    // 今日驾驶次数
+    todayDriveCount: 0,
+    // 累计驾驶次数
+    accumulativeDriveCount: 0,
+    // 可提现金额
+    canWithdrawCash: 0,
+    // 图片临时路径
+    tempFile: '',
+    // 图片路径
+    img: '',
+    // 供应商id、
+    agentId: '',
+    // 首次请求的默认的图片
+    defaultImg: ''
+  };
+  methods={
+    toManage() {
+      wepy.navigateTo({ url: 'manage' })
+    },
+    toFeedback() {
+      wepy.navigateTo({ url: 'feedback' })
+    },
+    toDeposit() {
+      console.log('余额', this.canWithdrawCash)
+      // 控制提现条件
+      // if (this.canWithdrawCash && this.canWithdrawCash !== '0.00' && this.canWithdrawCash !== 0) {
+      wepy.navigateTo({ url: 'deposit' })
+      // }
+    },
+    // 更换照片
+    upLoadImg() {
+      // 先把图片删除
+
+      let _this = this
+      wepy
+        .chooseImage({
+          count: 1,
+          sizeType: ['original', 'compressed'],
+          sourceType: ['album', 'camera']
+        })
+        .then(res => {
+          // 循环调用上传图片的功能
+          wepy.showToast({
+            title: '正在上传...',
+            icon: 'loading',
+            mask: true,
+            duration: 1000
+          })
+          _this.tempFile = res.tempFilePaths[0]
+          this.uploadPhote(_this.tempFile)
+        })
+    }
+  }
+  // 获取钱包信息
+  getMoney() {
+    let _this = this
+    let params = {
+      filter: {
+        id: this.agentId,
+        operatorId: this.operatorId
+      }
+    }
+    api.getHomeMoney(params).then(res => {
+      console.log('钱包信息222222', res)
+
+      if (res.code === '200') {
+        this.canWithdrawCash = res.resultData.data[0].canWithdrawCash
+        this.$apply()
+      } else if (res.code === '401') {
+        refresh().then(res => {
+          if (res === '1') {
+            _this.getMoney()
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: res.msg, // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 1000, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+      }
+    })
+  }
+  // 获取收入信息
+  getRental() {
+    let _this = this
+    api.getRental().then(res => {
+      if (res.code === '200') {
+        console.log('租金', res)
+        this.todayBuggyIncome = res.resultData.todayBuggyIncome
+        this.accumulativeBuggyIncome = res.resultData.accumulativeBuggyIncome
+        this.todayPayCount = res.resultData.todayPayCount
+        this.accumulativePayCount = res.resultData.accumulativePayCount
+        this.todayDriveCount = res.resultData.todayDriveCount
+        this.accumulativeDriveCount = res.resultData.accumulativeDriveCount
+        this.$apply()
+      } else if (res.code === '401') {
+        refresh().then(res => {
+          if (res === '1') {
+            _this.getRental()
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: res.msg, // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 1000, // 延迟时间,
+          mask: true// 显示透明蒙层，防止触摸穿透,
+        })
+      }
+    })
+  }
+  // 获取头像
+  getImg() {
+    let _this = this
+    let params = {
+      userId: this.principalId
+    }
+    api.getHeadImg(params).then(res => {
+      console.log('头像', res)
+      if (res.code === '200') {
+        this.img = res.resultData.data
+        // 保存默认头像
+        this.defaultImg = res.resultData.data
+        this.headImg = this.img
+        console.log('首次获取的头像', this.headImg)
+        this.$apply()
+      } else if (res.code === '401') {
+        refresh().then(res => {
+          if (res === '1') {
+            _this.getImg()
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: res.msg, // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 1000, // 延迟时间,
+          mask: true// 显示透明蒙层，防止触摸穿透,
+        })
+      }
+    })
+  }
+  // 获取设备信息
+  getDevice() {
+    let _this = this
+    console.log('调用了嘛')
+    let id = wepy.getStorageSync('agentialId')
+    wxRequset.get(`/AGENT/agents/buggy-statistical/${id}`).then(res => {
+      console.log('设备信息', res)
+      if (res.code === '200') {
+        this.offLineTotal = res.resultData.offLineTotal
+    // 全部设备
+        this.total = res.resultData.total
+    // 故障设备总数
+        this.faultTotal = res.resultData.faultTotal
+    // 空闲设备总数
+        this.freeTotal = res.resultData.freeTotal
+    // 低电量设备总数
+        this.lowBatteryTotal = res.resultData.lowBatteryTotal
+    // 投放设备总数
+        this.putTotal = res.resultData.putTotal
+    // 使用中设备总数
+        this.useTotal = res.resultData.useTotal
+    // 未读系统信息总数
+        this.totalSysMsgNumber = res.resultData.totalSysMsgNumber
+        this.$apply()
+      } else if (res.code === '401') {
+        refresh().then(res => {
+          if (res === '1') {
+            _this.getDevice()
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: 'title', // 提示的内容,
+          icon: 'success', // 图标,
+          duration: 2000, // 延迟时间,
+          mask: true, // 显示透明蒙层，防止触摸穿透,
+          success: res => {}
+        })
+      }
+    })
+  }
+  // 上传图片
+  uploadPhote(tempFile) {
+    let tempFiles = tempFile
+    var _this = this
+    let id = wepy.getStorageSync('principalId')
+    let token = wepy.getStorageSync('token')
+    // let token = wepy.getStorageSync('token')
+     // 调用微信的上传图片功能
+    wepy.uploadFile({
+            url:`https://buggytest.mzjmedia.net/AGENT/agent/upload-file-wx?accessToken=${token}`, // 仅为示例，非真实的接口地址
+            filePath: tempFile,
+            name: 'file',
+            header: { 'content-type': 'multipart/form-data' }
+              // header: {'Content-type': 'application/x-www-form-urlencoded'}
+            })
+            .then(res => {
+              _this.headImg = ''
+              if (res.statusCode === 200) {
+                let resData = JSON.parse(res.data)
+                if (resData.code === '200') {
+                  if (_this.img !== _this.defaultImg) {
+                    _this.closeUplod()
+                  }
+                  _this.img = resData.resultData
+                  wxRequset.put(`/USER/user/${id}/avatar`, {avatarPath: _this.img}).then(res => {
+                    if (res.code === '200') {
+                      _this.headImg = res.resultData
+                      this.$apply()
+                    }
+                  })
+                  this.$apply()
+                } else if (res.code === '401') {
+                  refresh().then(res => {
+                    if (res === '1') {
+                      _this.uploadPhote()
+                    }
+                  })
+                }
+              }
+            })
+  }
+      // 删除图片
+  closeUplod() {
+    let _this = this
+    let params = {
+      filePath: this.img,
+      header: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    }
+    api.deletePhoto(params).then(res => {
+      console.log('删除上传图片', res)
+      if (res.code === '200') {
+        this.img = ''
+        this.$apply()
+      } else if (res.code === '401') {
+        refresh().then(res => {
+          if (res === '1') {
+            _this.uploadPhote()
+          }
+        })
+      }
+    })
+    this.$apply()
+  }
+  onShow() {
+    this.getDevice()
+    this.getMoney()
+    this.getRental()
+  }
+
+  onLoad() {
+    this.principalId = wepy.getStorageSync('principalId')
+    this.principal = wepy.getStorageSync('principal')
+    this.agentId = wepy.getStorageSync('agentialId')
+
+    console.log('用户名', this.principal)
+    this.$apply()
+
+    this.getImg()
+    console.log('onLoad')
+  }
+}
+</script>

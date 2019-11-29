@@ -1,0 +1,173 @@
+<style lang="less">
+page{
+  background-color: #efeff4;
+}
+.depositProgress{
+  width:750rpx;
+  &-head{
+    width:750rpx;
+    height:307rpx;
+    background-color: #324db5;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    .top{
+      font-size: 120rpx;
+      color:#fff;
+      margin:40rpx  0 0rpx;
+    }
+    .bottom{
+      font-size: 30rpx;
+      color:#99a6da;
+    }
+  }
+&-content{
+  margin-top:60rpx;
+    font-size: 24rpx;
+    margin-left:40rpx;
+    &-top,&-center,&-bottom{
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start;
+      .left{
+        width:40rpx;
+        height:40rpx;
+        border-radius: 50%;
+        background-color: #324db5;
+        color:#fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right:20rpx;
+        position: relative;
+        .line{
+          height:80rpx;
+          width: 2px;
+          background-color:#324db5;
+          position: absolute;
+          top:40rpx;
+          left:49%;
+
+        }
+        .line.blur{
+           background-color:#324db5;
+        }
+        .line.gray{
+           background-color:#ccc;
+        }
+
+      }
+        .left.gray{
+          background-color:#ccc;
+        }
+      .right{
+        height:120rpx;
+        &-one{
+          font-size: 26rpx;
+          color:#1b1b1b;
+          margin-bottom:10rpx;
+        }
+        &-two{
+
+          font-size: 20rpx;
+          color:#707070;
+        }
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="depositProgress">
+    <view class="depositProgress-head">
+      <view class="top">￥{{money}}</view>
+      <view class="bottom">提现金额</view>
+    </view>
+    <view class="depositProgress-content">
+      <view class="depositProgress-content-top">
+        <view class="left">
+          <text>1</text>
+          <view class="line blur"></view>
+        </view>
+        <view class="right ">
+          <view class="right-one">提现提交成功，等待管理员审核</view>
+          <view class="right-two">{{applyTime}}</view>
+        </view>
+      </view>
+      <view class="depositProgress-content-center">
+         <view class="left">
+            <text>2</text>
+           <view class="line gray"></view>
+         </view>
+        <view class="right">
+          <view class="right-one">审核成功</view>
+          <view class="right-two">{{auditTime}}</view>
+        </view>
+      </view>
+      <view class="depositProgress-content-bottom">
+         <view class="left gray">
+           <text >3</text>
+         </view>
+        <view class="right">
+          <view class="right-one">未转账</view>
+          <view class="right-two">处理中，预计1~3个工作日转账支付宝余额中。</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '../../api/api'
+import {refresh} from '../../utils/refreshToken'
+export default class DepositProgrem3 extends wepy.page {
+  config = {
+    navigationBarTitleText: '小赛手运营商'
+  };
+  data={
+    money: '',
+    id: '',
+    // 提交成功的时间
+    applyTime: '',
+    // 审核时间
+    auditTime: '',
+    // 到账时间
+    transferTime: ''
+  }
+  onLoad(options) {
+    this.id = options.id
+    this.$apply()
+    console.log('onLoad')
+  }
+  getData() {
+    api.getDepDetail({id: this.id}).then(res => {
+      let _this = this
+      console.log('获取提现详情', res)
+      if (res.code === '200') {
+        this.money = res.resultData.money
+        this.applyTime = res.resultData.applyTime
+        this.auditTime = res.resultData.auditTime
+        this.transferTime = res.resultData.transferTime
+        this.$apply()
+      } else if (res.code === '401') {
+        refresh().then(res => {
+          if (res === '1') {
+            _this.getData()
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: res.msg, // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 1000, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+      }
+    })
+  }
+  onShow() {
+    this.getData()
+  }
+}
+</script>

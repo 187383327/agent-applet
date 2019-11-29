@@ -1,0 +1,286 @@
+<style lang="less">
+page {
+  background-color: #efeff4;
+}
+.deposit {
+  width: 750rpx;
+  background-color: #efeff4;
+  padding: 0 26rpx;
+  box-sizing: border-box;
+  &-top {
+    margin-top: 20rpx;
+    border-radius: 12rpx;
+    background-color: #fff;
+    width: 698rpx;
+    overflow: hidden;
+    .header {
+      height: 100rpx;
+      width: 698rpx;
+      background-color: #313131;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      padding: 0 28rpx;
+      box-sizing: border-box;
+      .left {
+        color: #d3d3d3;
+        font-size: 26rpx;
+        margin-right: 20rpx;
+        .curentMoney {
+          font-size: 40rpx;
+          color: #fff;
+        }
+      }
+      .right {
+        font-size: 26rpx;
+        width: 120rpx;
+        height: 60rpx;
+        background-color: #99a6da;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 12rpx;
+      }
+    }
+    .content {
+      padding: 0 30rpx;
+      box-sizing: border-box;
+      .title {
+        font-size: 26rpx;
+        color: #313131;
+        margin: 60rpx 0;
+      }
+      .money {
+        color: #313131;
+        padding-bottom: 60rpx;
+        border-bottom: 1rpx solid #e5e5ea;
+        .moneyInput {
+          display: flex;
+          justify-content: flex-start;
+          width: 638rpx;
+          margin-left: 16rpx;
+          font-size: 40rpx;
+        }
+        .error-tips{
+          color:red;
+          font-size: 24rpx;
+          margin-top:10rpx;
+        }
+      }
+      .keti {
+        font-size: 26rpx;
+        color: #324db5;
+        margin: 30rpx 0 60rpx;
+        .zheng {
+          color: #c7c7c7;
+        }
+      }
+      .submit {
+        width: 638rpx;
+        height: 88rpx;
+        background-color: #324db5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-size: 36rpx;
+        font-weight: bold;
+        margin-bottom: 60rpx;
+        border-radius: 12rpx;
+      }
+    }
+  }
+}
+</style>
+<template>
+  <view class="deposit">
+    <view class="deposit-top">
+      <view class="header">
+        <view class="left">
+          我的钱包
+          <text class="curentMoney">￥{{canWithdrawCash?canWithdrawCash:0.00}}</text>
+        </view>
+        <view class="right" @tap.stop="toDetail">提现明细</view>
+      </view>
+      <view class="content">
+        <view class="title">提现金额</view>
+        <view class="money">
+          <view class="moneyInput">
+            ￥
+            <input type="number" placeholder="输入提现金额" class="input" value="{{money}}" bindblur="moneyBlur" bindinput="moneyInput"></input>
+          </view>
+          <view class="error-tips" wx:if="{{ errorTipsShow }}">*您输入的提现金额异常，请整百输入</view>
+          <view class="error-tips" wx:if="{{ warningTipsShow && !errorTipsShow }}">输入的金额不能超过可提现额度</view>
+        </view>
+        <!-- 可提现金额 -->
+        <view class="keti">
+          <text>可提现金额：￥{{depositMoney}}</text>
+          <text class="zheng">(提现金额为整百提)</text>
+        </view>
+        <button class="submit" disabled="{{!stopClick}}" @tap.stop="toDeposit">提现</button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import api from '../../api/api'
+import {refresh} from '../../utils/refreshToken'
+export default class Deposit extends wepy.page {
+  config = {
+    navigationBarTitleText: '小赛手运营商'
+  };
+  data = {
+    depositMoney: 0,
+    principalIdL: '',
+    canWithdrawCash: 0,
+    money: '',
+    agentId: '',
+    // 是否阻止点击行为
+    stopClick: false,
+    // 异常提示,只能整百提现
+    errorTipsShow: false,
+    // 提现余额 超过了现有的金额
+    warningTipsShow: false,
+    // 校验输入金额
+    inputMoney: null
+  };
+  methods = {
+    toDetail() {
+      wepy.navigateTo({ url: 'depositDetail' })
+    },
+    toDeposit() {
+      this.stopClick = true
+      let _this = this
+      if (!this.money) {
+        this.stopClick = false
+        wepy.showToast({
+          title: '请输入提现金额', // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 2000, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+      } else {
+         // 提现
+        let params = {
+          agentId: this.agentId,
+          money: parseInt(this.money)
+        }
+        api.depositCheck(params).then(res => {
+          console.log('提现', res)
+          if (res.code === '200') {
+            wepy.showToast({
+              title: '提现申请成功', // 提示的内容,
+              icon: 'success', // 图标,
+              duration: 1000, // 延迟时间,
+              mask: true // 显示透明蒙层，防止触摸穿透,
+            })
+            setTimeout(() => {
+            // 跳到待审核的提现进度页面
+              wepy.navigateTo({ url: `depostiProgrem1?money=${this.money}` })
+              _this.stopClick = false
+            }, 1000)
+          } else if (res.code === '401') {
+            console.log('401嘛', res)
+            refresh().then(res => {
+              if (res === '1') {
+                _this.toDeposit()
+              }
+            })
+          } else {
+            wepy.showToast({
+              title: res.msg, // 提示的内容,
+              icon: 'none', // 图标,
+              duration: 1000, // 延迟时间,
+              mask: true // 显示透明蒙层，防止触摸穿透,
+            })
+          }
+          setTimeout(() => {
+          // 跳到待审核的提现进度页面
+            _this.stopClick = false
+          }, 1000)
+        })
+      }
+    },
+    moneyBlur(e) {
+      let testMoney = parseInt(e.detail.value)
+      // 提现金额
+      if (testMoney < 100 || !testMoney || testMoney % 100 !== 0) {
+        this.errorTipsShow = true
+      } else if (testMoney > this.depositMoney) {
+        this.warningTipsShow = true
+      }
+      this.$apply()
+    },
+    // 输入提现
+    moneyInput(e) {
+      let data = e.detail.value
+      this.money = parseInt(data)
+      // this.inputMoney = data
+      this.errorTipsShow = false
+      this.warningTipsShow = false
+      this.testNum()
+    }
+  };
+  getMoney() {
+    let _this = this
+    let params = {
+      filter: {
+        id: this.agentId,
+        operatorId: this.operatorId,
+        pageNumber: 0,
+        pageSize: 2
+      }
+    }
+    api.getHomeMoney(params).then(res => {
+      console.log('钱包信息', res)
+      if (res.code === '200') {
+        this.canWithdrawCash = res.resultData.data[0].canWithdrawCash
+        this.depositMoney =
+          Math.floor(parseInt(this.canWithdrawCash / 100)) * 100
+        this.$apply()
+      } else if (res.code === '401') {
+        console.log('401嘛', res)
+        refresh().then(res => {
+          if (res === '1') {
+            _this.getMoney()
+          }
+        })
+      } else {
+        wepy.showToast({
+          title: res.msg, // 提示的内容,
+          icon: 'none', // 图标,
+          duration: 1000, // 延迟时间,
+          mask: true // 显示透明蒙层，防止触摸穿透,
+        })
+      }
+    })
+  }
+  // 检查体重是否正确
+  testNum() {
+    this.timer = null
+    this.timer = setTimeout(() => {
+      let testMoney = this.money
+      if (testMoney < 100 || !testMoney || testMoney % 100 !== 0) {
+        this.errorTipsShow = true
+      } else if (testMoney > this.depositMoney) {
+        this.warningTipsShow = true
+      }
+      this.$apply()
+    }, 1000)
+  }
+  onShow() {
+    this.money = ''
+    this.getMoney()
+  }
+  onLoad() {
+    // 商家id
+    this.agentId = wepy.getStorageSync('agentialId')
+    // 负责人id
+    this.principalId = wepy.getStorageSync('principalId')
+    console.log('onLoad')
+  }
+}
+</script>

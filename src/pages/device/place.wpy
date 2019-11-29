@@ -1,0 +1,75 @@
+<style lang="less">
+</style>
+<template>
+  <view class="place">
+         <map
+      id="myMap"
+      style="width: 100%; height: 100vh"
+      scale="{{scalenumber}}"
+      latitude="{{latitude}}"
+      longitude="{{longitude}}"
+      markers="{{markers}}"
+      enable-zoom="true"
+      show-location="true"
+      bindmarkertap="markertap"
+      bindcallouttap="callouttap"
+      bindregionchange="regionChanged"
+    >
+    </map>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Place extends wepy.page {
+    config = {
+      navigationBarTitleText: '小赛手运营商'
+    }
+    data={
+      latitude: 0,
+      longitude: 0,
+      scalenumber: 16,
+      obj: {
+        id: 0,
+        name: '',
+        latitude: 0,
+        longitude: 0,
+        iconPath: '',
+        callout: {
+          content: '',
+          color: '#324db5',
+          fontSize: '20',
+          bgColor: '#fff',
+          padding: '5',
+          display: 'BYCLICK',
+          textAlign: 'center  '
+        }
+      },
+      markers: [ ]
+    }
+    methods={
+          // 获取当前经纬度
+    }
+    onLoad(options) {
+      console.log(options)
+      this.latitude = options.txlat
+      this.longitude = options.txlon
+      this.obj.name = options.agentName
+      this.obj.latitude = options.txlat
+      this.obj.longitude = options.txlon
+      this.obj.iconPath = '../../assets/cars.png'
+      this.obj.callout.content = options.addr
+      console.log('1', this.latitude)
+      console.log('1', this.longitude)
+      console.log('1', this.obj.latitude)
+      console.log('1', this.obj.longitude)
+      this.markers.push(this.obj)
+      this.$apply()
+      console.log('onLoad')
+    }
+    onShow() {
+      // this.getAltitude()
+      // this.IsLocation()
+    }
+  }
+</script>

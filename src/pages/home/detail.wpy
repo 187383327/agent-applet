@@ -1,0 +1,118 @@
+<style lang="less">
+page {
+  background-color: #efeff4;
+}
+.detail {
+  padding: 0 26rpx;
+  box-sizing: border-box;
+  width: 750rpx;
+  &-header {
+    font-size: 48rpx;
+    color: #324db5;
+    font-weight: bold;
+    margin: 50rpx 0 20rpx;
+  }
+
+  &-feedImg {
+    // height:210rpx;
+    display: flex;
+    justify-content: flex-start;
+
+    &-item {
+      width: 210rpx;
+      height: 210rpx;
+      border-radius: 34rpx;
+      margin: 20rpx 26rpx 20rpx 0;
+      overflow: hidden;
+      image {
+        width: 210rpx;
+        height: 210rpx;
+      }
+    }
+  }
+  &-img {
+    height: 190rpx;
+    width: 698rpx;
+    position: relative;
+    image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 698rpx;
+      height: 190rpx;
+    }
+    .power {
+      position: absolute;
+      top: 32rpx;
+      left: 32rpx;
+      font-size: 28rpx;
+      color: black;
+    }
+  }
+}
+</style>
+<template>
+  <view class="detail">
+    <view class="detail-header">{{title?title:typeDetail}}</view>
+    <view class="detail-feedImg" wx:if="{{picPath}}">
+      <view class="detail-feedImg-item" wx:for="{{picPath}}" @tap.stop="showBigImg({{item}},{{picPath}})">
+        <image src="{{item}}"></image>
+      </view>
+    </view>
+    <view class="detail-img">
+      <image src="../../assets/juxing.png"></image>
+      <text class="power">{{content=='null'?'无':content}}</text>
+    </view>
+  </view>
+</template>
+<script>
+import wepy from 'wepy'
+
+export default class Detail extends wepy.page {
+  config = {
+    navigationBarTitleText: '小赛手运营商'
+  };
+  data = {
+    power: '20',
+    batteryId: '3552870000012',
+    batteryMide: '01147200197569',
+    title: '',
+    id: '',
+    content: '',
+    imei: '',
+    typeDetail: '',
+    picPath: []
+  };
+  methods ={
+    showBigImg(pic, imgs) {
+      wepy.previewImage({
+        current: pic, // 当前显示图片的http链接
+        urls: imgs // 需要预览的图片http链接列表
+      })
+    }
+  }
+  onLoad(options) {
+    console.log(options)
+    this.id = options.id
+    if (options.title) {
+      this.title = options.title
+    }
+    if (options.typeDetail) {
+      this.typeDetail = options.typeDetail
+      this.$apply()
+      console.log('故障类型111', this.typeDetail)
+    }
+    if (options.content) {
+      this.content = options.content
+    }
+    if (options.imei) {
+      this.imei = options.imei
+    }
+    if (options.picPath) {
+      this.picPath = options.picPath.split(';')
+    }
+    this.$apply()
+    console.log('onLoad')
+  }
+}
+</script>

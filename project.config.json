@@ -1,0 +1,131 @@
+{
+	"description": "A WePY project",
+	"setting": {
+		"urlCheck": true,
+		"es6": false,
+		"postcss": false,
+		"minified": false,
+		"newFeature": true
+	},
+	"compileType": "miniprogram",
+	"appid": "wx9a467b89977428b1",
+	"projectname": "11",
+	"miniprogramRoot": "dist/",
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": []
+		},
+		"miniprogram": {
+			"current": 15,
+			"list": [
+				{
+					"id": -1,
+					"name": "首页",
+					"pathName": "pages/home/index",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "消息管理",
+					"pathName": "pages/home/manage",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "消息详情",
+					"pathName": "pages/home/detail",
+					"query": ""
+				},
+				{
+					"id": 3,
+					"name": "提现进度",
+					"pathName": "pages/home/depostiProgrem1",
+					"query": ""
+				},
+				{
+					"id": 4,
+					"name": "提现进度2",
+					"pathName": "pages/home/depostiProgrem2",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "提现进度3",
+					"pathName": "pages/home/depostiProgrem3",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "提现进度4",
+					"pathName": "pages/home/depostiProgrem4",
+					"query": ""
+				},
+				{
+					"id": 7,
+					"name": "提现明细",
+					"pathName": "pages/home/depositDetail",
+					"query": ""
+				},
+				{
+					"id": 8,
+					"name": "设备首页",
+					"pathName": "pages/device/device",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "设备首页",
+					"pathName": "pages/home/feedback",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "地图",
+					"pathName": "pages/device/place",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "反馈",
+					"pathName": "pages/home/feedback",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "反馈页面",
+					"pathName": "pages/home/feedback",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "模版",
+					"pathName": "pages/home/demo",
+					"query": ""
+				},
+				{
+					"id": 14,
+					"name": "提现页面",
+					"pathName": "pages/home/deposit",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "提现进度5",
+					"pathName": "pages/home/depostiProgrem5"
+				}
+			]
+		}
+	}
+}

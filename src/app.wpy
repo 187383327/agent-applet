@@ -1,0 +1,84 @@
+<style lang="less">
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+import getToken from './utils/getToken'
+import api from './api/api'
+export default class extends wepy.app {
+  constructor() {
+    super()
+    this.use('requestfix')
+    this.use('promisify')
+      // ??request??
+    this.intercept('request', {
+      config(config) {
+        // ????token
+        let token = wepy.getStorageSync('token') || ''
+        if (token) {
+          // ???token????header?
+          if (config.url.indexOf('?') !== -1) {
+            config.url = config.url + `&accessToken=${token}`
+          } else {
+            config.url = config.url + `?accessToken=${token}`
+          }
+        }
+        // ????OBJECT?????????????????
+        return config
+      }
+    })
+  }
+  config = {
+    pages: [
+      'pages/home/login',
+      'pages/home/index',
+      'pages/home/detail',
+      'pages/home/manage',
+      'pages/home/feedback',
+      'pages/home/deposit',
+      'pages/home/depostiProgrem1',
+      'pages/home/depostiProgrem2',
+      'pages/home/depostiProgrem3',
+      'pages/home/depostiProgrem4',
+      'pages/home/depostiProgrem5',
+      'pages/home/depositDetail',
+      'pages/device/device',
+      'pages/device/place'
+    ],
+    window: {
+      backgroundTextStyle: 'dark',
+      navigationBarBackgroundColor: '#324db5',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'white',
+      onReachBottomDistance: 50
+    },
+    tabBar: {
+      selectedColor: '#324db5',
+      list: [
+        {
+          pagePath: 'pages/home/index',
+          text: '首页',
+          iconPath: './assets/Tab10.png',
+          selectedIconPath: './assets/Tab11.png'
+        },
+        {
+          pagePath: 'pages/device/device',
+          text: '设备',
+          iconPath: './assets/Tab2.png',
+          selectedIconPath: './assets/Tab22.png'
+        }
+      ]
+    }
+  }
+  onLaunch() {
+    var params = getToken.getTokenData()
+    console.log('??', params)
+    api.getToken(params).then(res => {
+      if (res.code === '200') {
+        wepy.setStorageSync('token', res.resultData)
+      }
+    })
+  }
+}
+</script>
